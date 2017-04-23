@@ -8,7 +8,7 @@ group = "hab"
 default_modules = [ "access_compat", "alias", "auth_basic", "authn_file", "authn_core", "authz_host",
                     "authz_groupfile", "authz_user", "autoindex", "dir", "env", "filter",
                     "headers", "log_config", "mime", "reqtimeout", "setenvif", "ssl", "status", "version",
-                    "socache_shmcb", "php7" ]
+                    "socache_shmcb", "php7", "info" ]
 
 #httpd-default settings
 timeout = 60
@@ -37,12 +37,12 @@ threadlimit = 192
 
 #mod_status
 [mod_status]
-allow = "127.0.0.1"
+allow = "::1"
 extended = "Off"
 
 #mod_info
 [mod_info]
-allow = "127.0.0.1"
+allow = "127.0.0.1 ::1"
 
 #mod_proxy settings
 [mod_proxy]
