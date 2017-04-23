@@ -12,7 +12,7 @@ default_modules = [ "access_compat", "alias", "auth_basic", "authn_file", "authn
 
 #httpd-default settings
 timeout = 60
-keepalive = "Off"
+keepalive = "On"
 keepaliverequests = 100
 keepalivetimeout = 5
 serversignature = "Off"
