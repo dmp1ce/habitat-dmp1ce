@@ -244,8 +244,6 @@ do_check() {
 # specific directories in your package, or installing pre-built binaries into
 # your package.
 do_install() {
-  echo "Something here" > ${pkg_prefix}/something.txt
-
   # Setup ServerRoot for httpd
   mkdir -p ${pkg_prefix}/httpd
   ln -sf $(pkg_path_for httpd)/bin ${pkg_prefix}/httpd/bin
