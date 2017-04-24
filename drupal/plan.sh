@@ -249,6 +249,12 @@ do_install() {
   cp -r ../${pkg_dirname} ${pkg_prefix}
   mv ${pkg_prefix}/${pkg_dirname} ${pkg_prefix}/${pkg_name}
 
+  # Create symlink for /files
+  ln -sf ${pkg_svc_data_path}/files ${pkg_prefix}/${pkg_name}/sites/default/files
+
+  # Create symlink for settings.php
+  ln -sf ${pkg_svc_data_path}/settings.php ${pkg_prefix}/${pkg_name}/sites/default/settings.php
+
   # Setup ServerRoot for httpd
   mkdir -p ${pkg_prefix}/httpd
   ln -sf $(pkg_path_for httpd)/bin ${pkg_prefix}/httpd/bin

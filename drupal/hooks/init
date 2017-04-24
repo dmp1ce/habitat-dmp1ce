@@ -3,8 +3,20 @@
 
 chmod +x {{pkg.svc_data_path}}
 
-if [ ! -h {{pkg.svc_data_path}}/htdocs ]; then
-  ln -s {{pkg.path}}/drupal {{pkg.svc_data_path}}/htdocs
+# Symlink drupal root
+if [ -h {{pkg.svc_data_path}}/htdocs ]; then
+  rm {{pkg.svc_data_path}}/htdocs
+fi
+ln -s {{pkg.path}}/{{pkg.name}} {{pkg.svc_data_path}}/htdocs
+
+# Create files directory
+mkdir -p {{pkg.svc_data_path}}/files
+chown hab:hab {{pkg.svc_data_path}}/files
+
+# Create settings.php
+if [ ! -f {{pkg.svc_data_path}}/settings.php ]; then
+  cp -H {{pkg.svc_data_path}}/htdocs/sites/default/default.settings.php {{pkg.svc_data_path}}/settings.php
+  chown hab:hab {{pkg.svc_data_path}}/settings.php
 fi
 
 mkdir -p {{pkg.svc_data_path}}/cgi-bin
