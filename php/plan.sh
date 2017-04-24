@@ -53,15 +53,17 @@ do_build() {
 do_install() {
   do_default_install
 
-  # Copy php.ini 
-  install -Dv -m644 "php.ini-development" "${pkg_prefix}/lib/php.ini"
+  # Copy reference php.ini files
+  install -Dv -m644 "php.ini-production" "${pkg_prefix}"
+  install -Dv -m644 "php.ini-development" "${pkg_prefix}"
+
+  # Symlink php.ini for default
+  ln -sf php.ini-production ${pkg_prefix}/lib/php.ini
 
   # The install uses apxs which puts some files in the httpd package
   # Copy httpd installed files into php
   install -Dv "$(pkg_path_for httpd)/modules/libphp7.so" \
     "${pkg_prefix}/httpd/modules/libphp7.so"
-  install -Dv -m644 "$(pkg_path_for httpd)/conf/httpd.conf" \
-    "${pkg_prefix}/httpd/conf/httpd.conf"
 }
 
 do_check() {

@@ -19,5 +19,13 @@ if [ ! -f {{pkg.svc_data_path}}/settings.php ]; then
   chown hab:hab {{pkg.svc_data_path}}/settings.php
 fi
 
+# Create php.ini
+if [ ! -f {{pkg.svc_data_path}}/php.ini ]; then
+  cp -L {{pkg.path}}/php.ini-production {{pkg.svc_data_path}}/php.ini
+  # Enable opcache
+  sed -i '/\[opcache\]/azend_extension=opcache.so' {{pkg.svc_data_path}}/php.ini
+  sed -i '/^;opcache.enable=1/s/^;//' {{pkg.svc_data_path}}/php.ini
+fi
+
 mkdir -p {{pkg.svc_data_path}}/cgi-bin
 mkdir -p {{pkg.svc_var_path}}/logs

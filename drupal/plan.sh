@@ -255,6 +255,9 @@ do_install() {
   # Create symlink for settings.php
   ln -sf ${pkg_svc_data_path}/settings.php ${pkg_prefix}/${pkg_name}/sites/default/settings.php
 
+  # Symlink php.ini
+  ln -sf $(pkg_path_for php)/php.ini-production ${pkg_prefix}/
+
   # Setup ServerRoot for httpd
   mkdir -p ${pkg_prefix}/httpd
   ln -sf $(pkg_path_for httpd)/bin ${pkg_prefix}/httpd/bin
@@ -285,4 +288,3 @@ do_strip() {
 do_end() {
   return 0
 }
-
