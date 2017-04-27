@@ -35,6 +35,7 @@ do_build() {
     --enable-exif \
     --enable-mbstring \
     --enable-opcache \
+    --enable-zip \
     --with-mysql=mysqlnd \
     --with-mysqli=mysqlnd \
     --with-pdo-mysql=mysqlnd \

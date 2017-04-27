@@ -6,7 +6,7 @@
 # and `pkg_version` to define the fully-qualified package name, which determines
 # where the package is installed to on disk, how it is referred to in package
 # metadata, and so on.
-pkg_name=drupal
+pkg_name=drupal-demo
 
 # Required unless overridden by the `HAB_ORIGIN` environment variable.
 # The origin is used to denote a particular upstream of a package.
@@ -14,7 +14,7 @@ pkg_origin=dmp1ce
 
 # Required.
 # Sets the version of the package.
-pkg_version="8.3.0"
+pkg_version="8.3.1"
 
 # Optional.
 # The name and email address of the package maintainer.
@@ -30,12 +30,13 @@ pkg_license=('GPL-2.0')
 # will work. Typically, the relative path for the URL is partially constructed
 # from the pkg_name and pkg_version values; however, this convention is not
 # required.
-pkg_source="https://ftp.drupal.org/files/projects/${pkg_name}-${pkg_version}.tar.gz"
+pkg_source="https://ftp.drupal.org/files/projects/drupal-${pkg_version}.tar.gz"
 
 # Optional.
 # The resulting filename for the download, typically constructed from the
 # pkg_name and pkg_version values.
-# pkg_filename="${pkg_name}-${pkg_version}.tar.gz"
+pkg_filename="drupal-${pkg_version}.tar.gz"
+pkg_dirname=drupal-${pkg_version}
 
 # Required if a valid URL is provided for pkg_source or unless do_verify() is overridden.
 # The value for pkg_shasum is a sha-256 sum of the downloaded pkg_source. If you
@@ -43,7 +44,7 @@ pkg_source="https://ftp.drupal.org/files/projects/${pkg_name}-${pkg_version}.tar
 # and using the sha256sum or gsha256sum tools. Also, if you do not have
 # do_verify() overridden, and you do not have the correct sha-256 sum, then the
 # expected value will be shown in the build output of your package.
-pkg_shasum="0cd22d72b5eba604d2b455f97a13b8c551bd1056d857fb45db3a851ce8b09980"
+pkg_shasum="ea855ac6cc6dcc05494c93e6cf65dfe0a8006135ecd21bf6f0f345e7d5222c10"
 
 # Optional.
 # An array of package dependencies needed at runtime. You can refer to packages
@@ -52,12 +53,13 @@ pkg_shasum="0cd22d72b5eba604d2b455f97a13b8c551bd1056d857fb45db3a851ce8b09980"
 pkg_deps=(
   dmp1ce/php
   dmp1ce/httpd
+  dmp1ce/drush
   core/sqlite
 )
 
 # Optional.
 # An array of the package dependencies needed only at build time.
-pkg_build_deps=(core/composer)
+pkg_build_deps=(dmp1ce/composer)
 
 # Optional.
 # An array of paths, relative to the final install of the software, where
@@ -140,7 +142,7 @@ pkg_svc_group="$pkg_svc_user"
 # A short description of the package. It can be a simple string, or you can
 # create a multi-line description using markdown to provide a rich description
 # of your package.
-pkg_description="Drupal CMS"
+pkg_description="Demonstration of the Drupal CMS with default settings."
 
 # Required for core plans, optional otherwise.
 # The project home page for the package.
@@ -256,18 +258,18 @@ do_install() {
   ln -sf ${pkg_svc_data_path}/settings.php ${pkg_prefix}/${pkg_name}/sites/default/settings.php
 
   # Symlink php.ini
-  ln -sf $(pkg_path_for php)/php.ini-production ${pkg_prefix}/
+  ln -sf $(pkg_path_for dmp1ce/php)/php.ini-production ${pkg_prefix}/
 
   # Setup ServerRoot for httpd
   mkdir -p ${pkg_prefix}/httpd
-  ln -sf $(pkg_path_for httpd)/bin ${pkg_prefix}/httpd/bin
-  ln -sf $(pkg_path_for httpd)/conf ${pkg_prefix}/httpd/conf
-  ln -sf $(pkg_path_for httpd)/error ${pkg_prefix}/httpd/error
-  ln -sf $(pkg_path_for httpd)/icons ${pkg_prefix}/httpd/icons
+  ln -sf $(pkg_path_for dmp1ce/httpd)/bin ${pkg_prefix}/httpd/bin
+  ln -sf $(pkg_path_for dmp1ce/httpd)/conf ${pkg_prefix}/httpd/conf
+  ln -sf $(pkg_path_for dmp1ce/httpd)/error ${pkg_prefix}/httpd/error
+  ln -sf $(pkg_path_for dmp1ce/httpd)/icons ${pkg_prefix}/httpd/icons
   mkdir -p ${pkg_prefix}/httpd/modules
-  ln -sf $(pkg_path_for httpd)/modules/* ${pkg_prefix}/httpd/modules/
+  ln -sf $(pkg_path_for dmp1ce/httpd)/modules/* ${pkg_prefix}/httpd/modules/
   # Get Apache php module from php package
-  ln -sf $(pkg_path_for php)/httpd/modules/libphp7.so ${pkg_prefix}/httpd/modules/mod_php7.so
+  ln -sf $(pkg_path_for dmp1ce/php)/httpd/modules/libphp7.so ${pkg_prefix}/httpd/modules/mod_php7.so
 
   # Symlink httpd configuration files
   ln -sf $(pkg_path_for dmp1ce/httpd) ${pkg_prefix}/httpd

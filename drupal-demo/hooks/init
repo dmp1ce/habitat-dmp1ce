@@ -29,3 +29,12 @@ fi
 
 mkdir -p {{pkg.svc_data_path}}/cgi-bin
 mkdir -p {{pkg.svc_var_path}}/logs
+
+# Install Drupal
+if [ ! -f {{pkg.svc_data_path}}/htdocs/sites/default/files/.ht.sqlite ]; then
+  drush site-install standard install_configure_form.update_status_module='array(FALSE,FALSE)' -y -r {{pkg.svc_data_path}}/htdocs --account-name=admin --account-pass=password --site-name="Habitat Drupal Demo" --db-url=sqlite://sites/default/files/.ht.sqlite
+  # Set owner as 'hab' again
+  chown -R hab:hab {{pkg.svc_data_path}}/files
+  echo "Created Standard Drupal install with user 'admin' and password 'password'."
+  echo "Visit http://localhost:8080 in web browser to view the Drupal demo site."
+fi
