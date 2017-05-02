@@ -1,3 +1,8 @@
+# This package has the following issues:
+#   - Requires system GHC (Cannot download GHC during 'stack setup')
+#     https://github.com/commercialhaskell/stack/issues/3144
+#   - Build must symlink to /etc/protocol
+#   - Stack downloads several dependencies into '$HAB_CACHE_SRC_PATH/.stack'
 pkg_name=stack
 pkg_origin=dmp1ce
 pkg_version="1.4.0"
@@ -18,7 +23,9 @@ pkg_deps=(
   core/libiconv
   core/gmp
   core/libffi
+  core/gcc
   dmp1ce/ghc
+  core/iana-etc
 )
 
 pkg_build_deps=(
@@ -30,17 +37,30 @@ pkg_bin_dirs=(bin)
 pkg_description="The Haskell Tool Stack"
 pkg_upstream_url="https://docs.haskellstack.org/en/stable/README/"
 
+_stack_root="$HAB_CACHE_SRC_PATH/stack-root"
+do_clean() {
+  do_default_clean
+
+  # Remove files that could have also been created during the last build.
+  rm -fv /etc/protocol
+  rm -rfv ${_stack_root}
+}
+
 do_build() {
   export SYSTEM_CERTIFICATE_PATH="$(pkg_path_for core/cacerts)/ssl"
-  export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:$(pkg_path_for core/libiconv)/lib"
-  stack --system-ghc --stack-yaml=stack-8.0.yaml setup
-  stack --extra-include-dirs=$(pkg_path_for core/zlib)/include --extra-lib-dirs=$(pkg_path_for core/zlib)/lib --system-ghc --stack-yaml=stack-8.0.yaml build
+  export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:$(pkg_path_for core/libiconv)/lib:$(pkg_path_for core/gcc)/lib"
+  # Require /etc/protocols for tcp service
+  ln -sfv $(pkg_path_for core/iana-etc)/etc/protocols /etc
+  stack --stack-root=${_stack_root} --system-ghc --stack-yaml=stack-8.0.yaml setup
+  stack --stack-root="${_stack_root}" --extra-include-dirs="$(pkg_path_for core/zlib)/include" \
+    --extra-lib-dirs="$(pkg_path_for core/zlib)/lib" --system-ghc --stack-yaml=stack-8.0.yaml build
 }
 
 do_check() {
   export SYSTEM_CERTIFICATE_PATH="$(pkg_path_for core/cacerts)/ssl"
-  export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:$(pkg_path_for core/libiconv)/lib"
-  stack --extra-include-dirs=$(pkg_path_for core/zlib)/include --extra-lib-dirs=$(pkg_path_for core/zlib)/lib --system-ghc test
+  export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:$(pkg_path_for core/libiconv)/lib:$(pkg_path_for core/gcc)/lib"
+  stack --stack-root="${_stack_root}" --extra-include-dirs="$(pkg_path_for core/zlib)/include" \
+    --extra-lib-dirs="$(pkg_path_for core/zlib)/lib" --system-ghc --stack-yaml=stack-8.0.yaml test
 }
 
 do_install() {
