@@ -26,10 +26,11 @@ pkg_deps=(
   core/gcc
   dmp1ce/ghc
   core/iana-etc
+  core/make
+  core/gawk
 )
 
 pkg_build_deps=(
-  core/make
   dmp1ce/stack
 )
 
@@ -66,9 +67,38 @@ do_check() {
 do_install() {
   # --copy-bins only copies stack into /root directory.
   # Issue here: https://github.com/commercialhaskell/stack/issues/848
-  # Instead find stack and copy to bin
+  # Instead find stack and copy to $pkg_prefix
   find .stack-work/install/x86_64-linux/ -name stack \
     -exec sh -c 'file -i "$1" | grep -q "x-executable; charset=binary"' _ {} \; \
     -print \
-    -exec install -D {} ${pkg_prefix}/bin/stack \;
+    -exec install -D {} ${pkg_prefix}/stack \;
+
+  # Create wrapper to fix various issues with stack
+  cat > "$pkg_prefix/bin/stack" <<- EOM
+#!/bin/sh
+
+# mkdir -p ~/.stack/programs/x86_64-linux
+# ln -sf "$(pkg_path_for ghc)" ~/.stack/programs/x86_64-linux/ghc-${ghc_version}
+# echo "installed" > ~/.stack/programs/x86_64-linux/ghc-${ghc_version}.installed
+
+export SYSTEM_CERTIFICATE_PATH="$(pkg_path_for cacerts)/ssl/certs"
+
+#fix trouble stack has finding awk
+#export AWK="$(pkg_path_for gawk)/bin/awk"
+
+# Help Stack access sh. Required for 'network' and 'old-time' packages for example
+export PATH="\$PATH:/bin"
+
+# fix trouble stack has finding libgmp
+export LIBRARY_PATH="\$LIBRARY_PATH:${LD_RUN_PATH}"
+export LD_LIBRARY_PATH="\$LD_LIBRARY_PATH:${LD_RUN_PATH}"
+export LD_RUN_PATH="\$LD_RUN_PATH:${LD_RUN_PATH}"
+
+exec "$pkg_prefix/stack" --system-ghc \
+  --extra-include-dirs="$(pkg_path_for core/zlib)/include" \
+  --extra-lib-dirs="$(pkg_path_for core/zlib)/lib" "\$@"
+
+EOM
+
+  chmod +x "$pkg_prefix/bin/stack"
 }
