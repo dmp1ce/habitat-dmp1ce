@@ -1,5 +1,5 @@
-pkg_name=scaffolding-haskell
-pkg_description="Scaffolding for Haskell Stack Applications"
+pkg_name=scaffolding-yesod
+pkg_description="Scaffolding for Yesod Applications"
 pkg_origin=dmp1ce
 pkg_maintainer="David Parrish <daveparrish@tutanota.com>"
 pkg_version="0.1.0"
