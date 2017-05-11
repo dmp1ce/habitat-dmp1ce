@@ -1,8 +1,8 @@
 # Yesod Scaffolding
 
-The Yesod scaffolding automatically builds and runs a [Yesod](http://www.yesodweb.com/book) project using [Stack](https://docs.haskellstack.org/en/stable/README/) project.
+The Yesod scaffolding automatically builds and runs a [Yesod](http://www.yesodweb.com/book) project using [Stack](https://docs.haskellstack.org/en/stable/README/).
 
-This is a minimal scaffolding which builds a defaultYesod app and runs it but doesn't help with setting up database.
+This is a minimal scaffolding which builds a default Yesod app and runs it but doesn't help with setting up database.
 
 ## Getting Started with Scaffolding
 
