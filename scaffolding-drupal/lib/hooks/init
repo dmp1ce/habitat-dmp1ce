@@ -1,0 +1,42 @@
+#!/bin/sh
+#
+
+chmod +x {{pkg.svc_data_path}}
+
+# Symlink drupal root
+if [ -h {{pkg.svc_data_path}}/app ]; then
+  rm {{pkg.svc_data_path}}/app
+fi
+ln -s {{pkg.path}}/app {{pkg.svc_data_path}}/app
+
+# Create files directory
+mkdir -p {{pkg.svc_data_path}}/files
+chown hab:hab {{pkg.svc_data_path}}/files
+
+# Create settings.php
+if [ ! -f {{pkg.svc_data_path}}/settings.php ]; then
+  cp -H {{pkg.svc_data_path}}/app/web/sites/default/default.settings.php {{pkg.svc_data_path}}/settings.php
+  chown hab:hab {{pkg.svc_data_path}}/settings.php
+fi
+
+# Create php.ini
+if [ ! -f {{pkg.svc_data_path}}/php.ini ]; then
+  cp -L {{pkg.path}}/php.ini-production {{pkg.svc_data_path}}/php.ini
+  # Enable opcache
+  sed -i '/\[opcache\]/azend_extension=opcache.so' {{pkg.svc_data_path}}/php.ini
+  sed -i '/^;opcache.enable=1/s/^;//' {{pkg.svc_data_path}}/php.ini
+fi
+
+mkdir -p {{pkg.svc_data_path}}/cgi-bin
+mkdir -p {{pkg.svc_var_path}}/logs
+
+# Install Drupal
+#if [ ! -f {{pkg.svc_data_path}}/app/web/sites/default/files/.ht.sqlite ]; then
+#  cd "{{pkg.svc_data_path}}/app/web"
+#  ../vendor/bin/drush site-install standard install_configure_form.update_status_module='array(FALSE,FALSE)' -y --account-name=admin --account-pass=password --site-name="Habitat Drupal Scaffolding" --db-url=sqlite://sites/default/files/.ht.sqlite
+#  # Set owner as 'hab' again
+#  chown -R hab:hab {{pkg.svc_data_path}}/files
+#  echo "Created Standard Drupal install with user 'admin' and password 'password'."
+#  echo "Visit http://localhost:8080 in web browser to view the Drupal demo site."
+#fi
+echo "Visit http://localhost:8080 in web browser to view the Drupal site."
